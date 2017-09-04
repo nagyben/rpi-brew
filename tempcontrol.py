@@ -22,9 +22,9 @@ class TemperatureController:
         self.control_pin = control_pin
         self.time_period = time_period
 
-    def control(self):
+    def control(self, temp):
         try:
-            if self.read_temp() < self.setpoint:
+            if temp < self.setpoint:
                 self.heat_on()
             else:
                 self.heat_off()

@@ -2,10 +2,13 @@ import sys
 import threading
 import time
 import logging
+from tempsensor import TemperatureSensor
+import datalogging
 
 import PyQt5
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import Qt
+from PyQt5 import QtGui
 
 import mainwindow_auto
 
@@ -18,31 +21,38 @@ log.addHandler(consolehandler)
 
 
 class MainWindow(QMainWindow, mainwindow_auto.Ui_MainWindow):
+    TSRed = TemperatureSensor()
+    TSBlue = TemperatureSensor()
+    TSGreen = TemperatureSensor()
 
     def __init__(self):
         super(self.__class__, self).__init__()
         self.setupUi(self)
-        self.clockTick()
-        log.info("herp")
-        self.setMouseTracking(True)
+        self.clockTick() # start clock
+        # redb = QPushButton(self)
 
     def clockTick(self):
         self.tTime.setText('{}'.format(time.strftime("%H:%M:%S")))
         timer = threading.Timer(1, self.clockTick)
         timer.start()
 
-    def keyPressEvent(self, QKeyEvent):
-        if QKeyEvent.key() == Qt.Key_Escape:
-            self.close()
+    def start_new_timer(self):
+        pass
 
-    def mouseMoveEvent(self, QMouseEvent):
-        self.statusBar.showMessage('{}, {}'.format(QMouseEvent.x(), QMouseEvent.y()))
+    def log_data(self):
+        datalogging.log_data(self.TSRed.tempC, self.TSBlue.tempC, self.TSGreen.tempC)
+
+    def herp(self):
+        redb = QPushButton(self)
+
+
 
 def main():
     log.info('Starting app...')
     app = QApplication(sys.argv)
     form = MainWindow()
     form.show()
+    form.gridLayout.addWidget(QPushButton())
     sys.exit(app.exec_())
 
 if __name__ == "__main__":
