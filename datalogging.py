@@ -19,6 +19,6 @@ consolehandler.setFormatter(appformatter)
 log.addHandler(consolehandler)
 
 def log_data(*argv):
-    message = ','.join(argv)
+    message = ','.join(map(str, argv))
     if len(message) > 0:
-        datalogger.info(message)
+        log.info(message)
