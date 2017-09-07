@@ -39,14 +39,16 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
 
     logging_enabled = False
 
+    temp_sensors = []
+
     def __init__(self):
         super(self.__class__, self).__init__()
         self.setupUi(self)
         self.clockTick() # start clock
-        self.tRedId.textChanged.connect(self.id_debouncer)
-        self.tBlueID.textChanged.connect(self.id_debouncer)
-        self.tGreenId.textChanged.connect(self.id_debouncer)
-        self.load_persistent_settings()
+        # self.tRedId.textChanged.connect(self.id_debouncer)
+        # self.tBlueId.textChanged.connect(self.id_debouncer)
+        # self.tGreenId.textChanged.connect(self.id_debouncer)
+
 
         self.btnPrep.clicked.connect(self.start_prep)
         self.btnMash.clicked.connect(self.start_mash)
@@ -54,29 +56,44 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
 
         self.btnLogging.clicked.connect(self.toggle_logging)
 
-        temp_sensors = [
+        self.temp_sensors = [
             {'sensor' : TemperatureSensor(),
-             'ui_label' : self.lRed,
-             'id_textbox' : self.tRedId},
+             'ui_temp' : self.lRed,
+             'ui_sensor_test' : self.lRedOK,
+             'id_textbox' : self.tRedId,
+             'persist_setting' : 'red_id'},
             {'sensor': TemperatureSensor(),
-             'ui_label': self.lBlue,
-             'id_textbox': self.tBlueId},
+             'ui_temp': self.lBlue,
+             'ui_sensor_test': self.lBlueOK,
+             'id_textbox': self.tBlueId,
+             'persist_setting': 'blue_id'},
             {'sensor': TemperatureSensor(),
-             'ui_label': self.lGreen,
-             'id_textbox': self.tGreenId}
+             'ui_temp': self.lGreen,
+             'ui_sensor_test': self.lGreenOK,
+             'id_textbox': self.tGreenId,
+             'persist_setting': 'green_id'}
         ]
+
+        self.load_persistent_settings()
+
+        for sensor in self.temp_sensors:
+            sensor['id_textbox'].textChanged.connect(self.id_debouncer)
 
     def load_persistent_settings(self):
         persist.load(SETTINGS_FILE)
 
-        if 'red_id' in persist.settings:
-            self.tRedId.setText(persist.settings['red_id'])
+        for sensor in self.temp_sensors:
+            if sensor['persist_setting'] in persist.settings:
+                sensor['id_textbox'].setText(persist.settings[sensor['persist_setting']])
 
-        if 'blue_id' in persist.settings:
-            self.tBlueID.setText(persist.settings['blue_id'])
-
-        if 'green_id' in persist.settings:
-            self.tGreenId.setText(persist.settings['green_id'])
+        # if 'red_id' in persist.settings:
+        #     self.tRedId.setText(persist.settings['red_id'])
+        #
+        # if 'blue_id' in persist.settings:
+        #     self.tBlueID.setText(persist.settings['blue_id'])
+        #
+        # if 'green_id' in persist.settings:
+        #     self.tGreenId.setText(persist.settings['green_id'])
 
     # 1 second timer - update clocks, read temperatures & log data
     def clockTick(self):
@@ -107,7 +124,7 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
         self.timer.start()
 
     def update_temp(self):
-        for
+        pass
 
     def toggle_logging(self):
         self.logging_enabled = not self.logging_enabled
@@ -130,30 +147,42 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
     def check_valid_id(self, sender):
         log.info(sender.objectName())
 
-        if sender.objectName() == 'tRedId':
-            label = self.lRedOK
-            sensor = self.TSRed
-            sensor.id = self.tRedId.text()
-            persist.settings['red_id'] = sensor.id
-        elif sender.objectName() == 'tBlueID':
-            label = self.lBlueOK
-            sensor = self.TSBlue
-            sensor.id = self.tBlueID.text()
-            persist.settings['blue_id'] = sensor.id
-        else:
-            label = self.lGreenOK
-            sensor = self.TSGreen
-            sensor.id = self.tGreenId.text()
-            persist.settings['green_id'] = sensor.id
+        for sensor in self.temp_sensors:
+            if sensor['id_textbox'].objectName() == sender.objectName():
+                sensor['sensor'].id = sensor['id_textbox'].text()
+                persist.settings[sensor['persist_setting']] = sensor['sensor'].id
+
+                if sensor['sensor'].test():
+                    sensor['ui_sensor_test'].setText("OK")
+                    sensor['ui_sensor_test'].setStyleSheet("color: green")
+                else:
+                    sensor['ui_sensor_test'].setText("NOK")
+                    sensor['ui_sensor_test'].setStyleSheet("color: red")
+
+        # if sender.objectName() == 'tRedId':
+        #     label = self.lRedOK
+        #     sensor = self.TSRed
+        #     sensor.id = self.tRedId.text()
+        #     persist.settings['red_id'] = sensor.id
+        # elif sender.objectName() == 'tBlueID':
+        #     label = self.lBlueOK
+        #     sensor = self.TSBlue
+        #     sensor.id = self.tBlueID.text()
+        #     persist.settings['blue_id'] = sensor.id
+        # else:
+        #     label = self.lGreenOK
+        #     sensor = self.TSGreen
+        #     sensor.id = self.tGreenId.text()
+        #     persist.settings['green_id'] = sensor.id
 
         persist.save(SETTINGS_FILE)
 
-        if sensor.test():
-            label.setText("OK")
-            label.setStyleSheet("color: green")
-        else:
-            label.setText("NOK")
-            label.setStyleSheet("color: red")
+        # if sensor.test():
+        #     label.setText("OK")
+        #     label.setStyleSheet("color: green")
+        # else:
+        #     label.setText("NOK")
+        #     label.setStyleSheet("color: red")
 
     def keyPressEvent(self, QKeyEvent):
         if QKeyEvent.key() == Qt.Key_Escape:
