@@ -203,6 +203,9 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
         # Add label and related start time to the timer list (fn clock_tick() updates the label)
         self.timers_to_update.append([self.lPrepElapsed, self.prep_start_time])
 
+        # change phase text
+        self.lPhase.setText("PREPPING")
+
     def start_mash(self):
         self.mash_start_time = time.localtime()
         self.lMashStart.setText(time.strftime('%H:%M', self.mash_start_time))
@@ -214,6 +217,9 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
         # Add label and related start time to the timer list (fn clock_tick() updates the label)
         self.timers_to_update.append([self.lMashElapsed, self.mash_start_time])
 
+        # change phase text
+        self.lPhase.setText("MASHING")
+
     def start_boil(self):
         self.boil_start_time = time.localtime()
         self.lBoilStart.setText(time.strftime('%H:%M', self.boil_start_time))
@@ -224,6 +230,9 @@ class BrewWindow(QMainWindow, brew_auto.Ui_MainWindow):
 
         # Add label and related start time to the timer list (fn clock_tick() updates the label)
         self.timers_to_update.append([self.lBoilElapsed, self.boil_start_time])
+
+        # change phase text
+        self.lPhase.setText("BOILING")
 
 
 def main():
