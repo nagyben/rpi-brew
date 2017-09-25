@@ -1,4 +1,3 @@
-import time
 import logging
 import os.path
 
@@ -13,35 +12,53 @@ log.addHandler(consolehandler)
 
 
 class TemperatureSensor:
-    id = ""
-    tempC = 0
-    setpointC = 0
-    sampling_interval = 1 # in seconds
+    name = ""
+    sensor_id = ""
+    tempC = -1
 
-    def __init__(self, id = "", setpointC = 20, sampling_interval = 1):
-        self.id = id
-        self.setpointC = setpointC
-        self.sampling_interval = sampling_interval
+    def __init__(self, name, sensor_id=""):
+        if name == "":
+            log.error("TemperatureSensor name not defined")
+            raise RuntimeError
+
+        self.name = name
+        self.sensor_id = sensor_id
 
     def update(self):
         self.tempC = self.read_temp()
 
     def read_temp(self):
-        lines = self.read_temp_raw()
-        while lines[0].strip()[-3:] != 'YES':
-            time.sleep(0.2)
-            lines = self.read_temp_raw()
+        if self.sensor_id == "":
+            log.warning("No ID set for sensor {}".format(self.sensor_id))
+        else:
+            path = DEVICE_PATH + self.sensor_id + '/w1_slave'
+            try:
+                f = open(path)
+                lines = f.readlines()
 
-        equals_pos = lines[1].find('t=')
-        if equals_pos != -1:
-            temp_string = lines[1][equals_pos + 2:]
-            temp_c = float(temp_string) / 1000.0
-            return temp_c
+                if lines[0].strip()[-3:] == 'YES':
+                    equals_pos = lines[1].find('t=')
 
-    def read_temp_raw(self):
-        f = open(DEVICE_PATH + self.id + '/w1_slave')
-        lines = f.readlines()
-        return lines
+                    if equals_pos != -1:
+                        temp_string = lines[1][equals_pos + 2:]
+                        temp_c = float(temp_string) / 1000.0
+                        return temp_c
+
+                    else:
+                        return -1
+
+                else:
+                    return -1
+
+            except Exception as e:
+                log.error(e)
+                return -1
 
     def test(self):
-        return os.path.isfile(DEVICE_PATH + self.id + '/w1_slave')
+        return os.path.isfile(DEVICE_PATH + self.sensor_id + '/w1_slave')
+
+    def get_string(self):
+        if self.tempC > 0:
+            return '{} °C'.format(self.tempC)
+        else:
+            return "n/a"

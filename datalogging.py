@@ -6,7 +6,7 @@ import time
 
 datalogger = logging.getLogger('datalogger')
 datalogger.setLevel(logging.INFO)
-dataformatter = logging.Formatter('[%(asctime)s],%(message)s')
+dataformatter = logging.Formatter('%(asctime)s,%(message)s')
 filehandler = logging.FileHandler(filename='brew-' + time.strftime('%Y-%m-%d') + '.log')
 filehandler.setFormatter(dataformatter)
 datalogger.addHandler(filehandler)

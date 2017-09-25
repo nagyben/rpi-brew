@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Brewery Controller v0.1</title>
+
+  <script src="static/js/lib/jquery.slim.min.js"></script>
+  <script src="static/js/lib/angular.min.js"></script>
+  <script src="static/js/lib/tether.min.js"></script>
+  <script src="static/js/lib/sizzle.min.js"></script>
+  <script src="static/js/lib/bootstrap.min.js"></script>
+  <script src="static/js/lib/noty.min.js"></script>
+
+  <script src="static/js/app.js"></script>
+  <script src="static/js/services/httpInterceptor.js"></script>
+  <script src="static/js/services/notificationService.js"></script>
+  <script src="static/js/controllers/breweryController.js"></script>
+
+
+  <link rel="stylesheet" href="static/css/lib/bootstrap.min.css" />
+  <link rel="stylesheet" href="static/css/lib/noty.css" />
+  <link rel="stylesheet" href="static/css/main.css" />
+
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+</head>
+
+<body ng-app="brewery">
+  <div class="container-fluid" ng-controller="BreweryController">
+    <h1 class="text-center">{{date | date : "EEEE dd MMM yyyy"}}</h1>
+    <div class="col-12" ng-show="display == 'brew'">
+      <div class="col-12">
+        <h1 class="text-center">{{mode}}</h1>
+      </div>
+      <div class="row">
+        <div class="col-4 text-center">
+          <h2 class="red">{{tRed}}</h2>
+        </div>
+        <div class="col-4 text-center">
+          <h2 class="blue">{{tBlue}}</h2>
+        </div>
+        <div class="col-4 text-center">
+          <h2 class="green">{{tGreen}}</h2>
+        </div>
+      </div>
+    </div>
+    <div class="col-12" ng-show="display == 'ferment'">
+      <h1 class="text-center">{{mode}}</h1>
+    </div>
+  </div>
+</body>
+
+</html>

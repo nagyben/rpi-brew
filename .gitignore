@@ -3,3 +3,7 @@
 
 # except for these
 !*.py
+!static/
+!static/**
+!templates/
+!templates/*
