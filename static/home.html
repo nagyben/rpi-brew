@@ -9,6 +9,7 @@
   <script src="static/js/lib/tether.min.js"></script>
   <script src="static/js/lib/sizzle.min.js"></script>
   <script src="static/js/lib/bootstrap.min.js"></script>
+  <script src="static/js/lib/bootstrap-switch.min.js"></script>
   <script src="static/js/lib/noty.min.js"></script>
 
   <script src="static/js/app.js"></script>
@@ -19,6 +20,7 @@
 
   <link rel="stylesheet" href="static/css/lib/bootstrap.min.css" />
   <link rel="stylesheet" href="static/css/lib/noty.css" />
+  <link rel="stylesheet" href="static/css/lib/bootstrap-switch.min.css" />
   <link rel="stylesheet" href="static/css/main.css" />
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
@@ -33,16 +35,24 @@
     <div class="col-12" ng-show="display == 'brew'">
       <div class="col-12">
         <h1 class="text-center">{{mode}}</h1>
+        <h2 class="text-center">Logging</h2>
+        <input class="text-center" type="checkbox" name="logEnabled">
       </div>
       <div class="row">
         <div class="col-4 text-center">
-          <h2 class="red">{{tRed}}</h2>
+          <h2 class="red">{{tRed || "n/a"}}</h2>
+          <input type="text" class="form-control" id="redId" ng-keyup="updateSensor($event)" />
+          <h2>{{prepElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
-          <h2 class="blue">{{tBlue}}</h2>
+          <h2 class="blue">{{tBlue || "n/a"}}</h2>
+          <input type="text" class="form-control" id="blueId" ng-keyup="updateSensor($event)" />
+          <h2>{{mashElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
-          <h2 class="green">{{tGreen}}</h2>
+          <h2 class="green">{{tGreen || "n/a"}}</h2>
+          <input type="text" class="form-control" id="greenId" ng-keyup="updateSensor($event)" />
+          <h2>{{boilElapsed}}</h2>
         </div>
       </div>
     </div>

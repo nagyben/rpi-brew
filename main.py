@@ -33,16 +33,25 @@ boil_start_time = None
 mash_start_time = None
 ferment_start_time = None
 
+logging_enabled = False
 
-def loop(time_interval):
+def loop():
     for sensor in sensors:
         sensor.update()
 
-    log_data()
+    if (logging_enabled):
+        log_data(
+            sensors[0].tempC,
+            sensors[1].tempC,
+            sensors[2].tempC,
+            mode
+        )
 
     # Restart loop
-    t = Timer(time_interval, loop)
+    t = Timer(1, loop)
     t.start()
+
+loop()
 
 # ------------------------------------------------------------------------- FLASK
 
@@ -74,30 +83,30 @@ def get_status():
         "mashStartTime": mash_start_time,
         "boilStartTime": boil_start_time,
         "fermentStartTime": ferment_start_time,
+        "logEnabled": logging_enabled,
         "sensors": tempsensors
     })
 
-@app.route("/sensor/<name>/<id>/<setpoint>", methods=['POST'])
-def create_modify_sensor(name, id, setpoint):
+@app.route("/sensor/<name>/<id>", methods=['POST'])
+def create_modify_sensor(name, id):
     for sensor in sensors:
         if sensor.name == name:
             log.info("Client requested sensor parameter change")
             sensor.sensor_id = id
-            sensor.setpoint_C = setpoint
             log.info(sensors)
             return jsonify({
                 "message": "Sensor '{}' updated".format(name),
-                "id": id,
-                "setpoint": setpoint
+                "name": name,
+                "id": id
             })
 
     log.info("Client requested sensor creation")
-    sensors.append(TemperatureSensor(name, id, setpoint))
+    sensors.append(TemperatureSensor(name, id))
     log.info(sensors)
     return jsonify({
         "message": "Sensor '{}' created".format(name),
-        "id": id,
-        "setpoint": setpoint
+        "name": name,
+        "id": id
     })
 
 @app.route("/prep", methods=['POST'])
@@ -178,3 +187,18 @@ def set_control(status):
     else:
         log.info("Unknown control request")
         return jsonify({"message": "Unknown control request '{}'".format(status)})
+
+@app.route("/log/<status>", methods=['POST'])
+def set_logging(status):
+    global logging_enabled
+    if status.lower() == "yes" or status == "1" or status.lower() == "true":
+        log.info("Client requested logging ON")
+        logging_enabled = True
+        return jsonify({"message": "Logging enabled"})
+    elif status.lower() == "no" or status == "0" or status.lower() == "false":
+        log.info("Client requested logging OFF")
+        logging_enabled = False
+        return jsonify({"message": "Logging disabled"})
+    else:
+        log.info("Unknown control request")
+        return jsonify({"message": "Unknown logging request '{}'".format(status)})

@@ -7,6 +7,8 @@ angular.module('brewery')
     $scope.display = 'brew';
     $scope.date = new Date();
 
+    $scope.logEnabled = true;
+
     $scope.prepStartTime;
     $scope.mashStartTime;
     $scope.boilStartTime;
@@ -57,19 +59,26 @@ angular.module('brewery')
       $scope.fermentStartTime = 0;
     }
 
-    function getStatus() {
+    function getStatus(first) {
       $http.get('http://localhost:5000/status', 1000)
         .then(
           function success(data) {
             $scope.mode = data.data.mode;
-            $scope.tRed = data.data.sensors[0].tempC < 0 ? "n/a" : data.data.sensors[0].tempC.toFixed(1);
-            $scope.tBlue = data.data.sensors[1].tempC < 0 ? "n/a" : data.data.sensors[1].tempC.toFixed(1);
-            $scope.tGreen = data.data.sensors[2].tempC < 0 ? "n/a" : data.data.sensors[2].tempC.toFixed(1);
+            $scope.tRed = data.data.sensors[0].tempC;
+            $scope.tBlue = data.data.sensors[1].tempC;
+            $scope.tGreen = data.data.sensors[2].tempC;
+            $scope.logEnabled = data.data.logEnabled;
+            $("[name='logEnabled']").bootstrapSwitch('state', $scope.logEnabled);
+            if (first === true) {
+              $scope.prepStartTime = data.data.prepStartTime;
+              $scope.mashStartTime = data.data.mashStartTime;
+              $scope.boilStartTime = data.data.boilStartTime;
+              $scope.fermentStartTime = data.data.fermentStartTime;
+            }
           },
           function error(data) {
             // try again
             console.log("Connection failed - trying again...");
-            getStatus();
           }
         );
     }
@@ -111,5 +120,25 @@ angular.module('brewery')
       );
     }
 
-    getStatus();
+    $scope.updateSensor = function($event) {
+      if ($event.originalEvent.keyCode == 13) { // if keyCode == enter
+        var name = "";
+        switch ($event.currentTarget.id) {
+          case 'redId': name = 'red'; break;
+          case 'blueId': name = 'blue'; break;
+          case 'greenId': name = 'green'; break;
+        }
+        if (name !== "") {
+          $http.post('http://localhost:5000/sensor/' + name + '/' + $event.currentTarget.value);
+        }
+        // $http.post('http://localhost:5000')
+      }
+    }
+
+    getStatus(true); // true = set first-time values.
+
+    $("[name='logEnabled']").bootstrapSwitch();
+    $('input[name="logEnabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
+      $http.post('http://localhost:5000/log/' + state);
+    });
   });
