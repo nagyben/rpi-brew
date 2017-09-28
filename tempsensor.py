@@ -26,6 +26,7 @@ class TemperatureSensor:
 
     def update(self):
         self.tempC = self.read_temp()
+        self.tempC = None if self.tempC == -1 else self.tempC
 
     def read_temp(self):
         if self.sensor_id == "":

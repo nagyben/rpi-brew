@@ -22,6 +22,7 @@
   <link rel="stylesheet" href="static/css/lib/noty.css" />
   <link rel="stylesheet" href="static/css/lib/bootstrap-switch.min.css" />
   <link rel="stylesheet" href="static/css/main.css" />
+  <link rel="stylesheet" href="static/font-awesome-4.7.0/css/font-awesome.min.css" />
 
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
@@ -32,32 +33,57 @@
 <body ng-app="brewery">
   <div class="container-fluid" ng-controller="BreweryController">
     <h1 class="text-center">{{date | date : "EEEE dd MMM yyyy"}}</h1>
-    <div class="col-12" ng-show="display == 'brew'">
-      <div class="col-12">
-        <h1 class="text-center">{{mode}}</h1>
-        <h2 class="text-center">Logging</h2>
-        <input class="text-center" type="checkbox" name="logEnabled">
+    <div class="alert alert-danger text-center" role="alert" ng-show="!connected">
+      Connection lost. Reconnecting... <i class="fa fa-spinner fa-pulse fa-fw"></i>
+    </div>
+    <div class="col-12 text-center">
+      <div class="col-12 mb-5 mt-5">
+        <h1 class="text-center">{{mode | uppercase}}</h1>
+        <div class="col-12 mb-2">
+          <span style="width:100px; display:inline-block" class="text-right">Logging</span>
+          <input class="text-center" type="checkbox" name="logEnabled" />
+        </div>
+
+        <div class="col-12">
+          <span style="width:100px; display:inline-block" class="text-right">Control</span>
+          <input class="text-center" type="checkbox" name="controlEnabled"/>
+        </div>
       </div>
+      <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" ng-class="{disabled: mode != 'ferment'}">
+            <a class="page-link" href="#" tabindex="-1" ng-click="stop()">Brew</a>
+          </li>
+          <li class="page-item" ng-class="{disabled: mode == 'ferment'}">
+            <a class="page-link" href="#" ng-click="startFerment()">Ferment</a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+    <div class="col-12" ng-show="mode != 'ferment'">
       <div class="row">
         <div class="col-4 text-center">
           <h2 class="red">{{tRed || "n/a"}}</h2>
-          <input type="text" class="form-control" id="redId" ng-keyup="updateSensor($event)" />
+          <input type="text" class="form-control" id="redId" ng-keyup="updateSensor($event)" ng-model="redId" />
+          <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
           <h2>{{prepElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
           <h2 class="blue">{{tBlue || "n/a"}}</h2>
-          <input type="text" class="form-control" id="blueId" ng-keyup="updateSensor($event)" />
+          <input type="text" class="form-control" id="blueId" ng-keyup="updateSensor($event)" ng-model="blueId" />
+          <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
           <h2>{{mashElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
           <h2 class="green">{{tGreen || "n/a"}}</h2>
-          <input type="text" class="form-control" id="greenId" ng-keyup="updateSensor($event)" />
+          <input type="text" class="form-control" id="greenId" ng-keyup="updateSensor($event)" ng-model="greenId" />
+          <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
           <h2>{{boilElapsed}}</h2>
         </div>
       </div>
     </div>
-    <div class="col-12" ng-show="display == 'ferment'">
-      <h1 class="text-center">{{mode}}</h1>
+    <div class="col-12" ng-show="mode == 'ferment'">
+
     </div>
   </div>
 </body>

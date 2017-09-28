@@ -7,14 +7,14 @@ import time
 brewlogger = logging.getLogger('brewlogger')
 brewlogger.setLevel(logging.INFO)
 dataformatter = logging.Formatter('%(asctime)s,%(message)s', "%Y-%m-%d %H:%M:%S")
-filehandler = logging.FileHandler(filename='brew-' + time.strftime('%Y-%m-%d') + '.log')
+filehandler = logging.FileHandler(filename='brew.log')
 filehandler.setFormatter(dataformatter)
 brewlogger.addHandler(filehandler)
 
 fermentlogger = logging.getLogger('fermentlogger')
 fermentlogger.setLevel(logging.INFO)
 dataformatter = logging.Formatter('%(asctime)s,%(message)s', "%Y-%m-%d %H:%M:%S")
-filehandler = logging.FileHandler(filename='ferment-' + time.strftime('%Y-%m-%d') + '.log')
+filehandler = logging.FileHandler(filename='ferment.log')
 filehandler.setFormatter(dataformatter)
 fermentlogger.addHandler(filehandler)
 

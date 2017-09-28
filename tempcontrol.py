@@ -1,4 +1,5 @@
 import logging
+import sys
 
 DEVICE_PATH = '/sys/bus/w1/devices/28-00000'
 
@@ -13,6 +14,10 @@ try:
     import RPi.GPIO as GPIO
 except RuntimeError:
     log.critical("Error importing RPi.GPIO!  Try using 'sudo'")
+    sys.exit(0)
+except ImportError:
+    log.warning("Module 'RPi.GPIO' not found - using dummy GPIO library")
+    import GPIO
 
 
 class TemperatureController:
@@ -22,6 +27,8 @@ class TemperatureController:
     control_pin = 0
     enabled = False
 
+    heating = 0
+
     def __init__(self, control_pin, time_period):
         self.control_pin = control_pin
         self.time_period = time_period
@@ -29,21 +36,26 @@ class TemperatureController:
         GPIO.setup(control_pin, GPIO.OUT, initial=GPIO.LOW)
 
     def control(self, temp):
-        if self.enabled:
-            if self.control_pin <= 0:
+        if temp is not None and temp > -1:
+            if self.control_pin >= 0:
                 try:
-                    if temp < self.setpoint:
+                    if temp < self.setpoint and self.heating == 0:
                         self.heat_on()
-                    else:
+                    elif temp > self.setpoint and self.heating == 1:
                         self.heat_off()
                 except Exception as e:
                     log.error(e)
             else:
                 log.error("Control pin not greater than 0")
+        else:
+            log.error("Temperature not given")
+            if self.heating == 1:
+                self.heat_off()
 
     def heat_on(self):
         if self.control_pin >= 0:
             GPIO.output(self.control_pin, GPIO.HIGH)
+            self.heating = 1
             log.info('Turning heater ON')
         else:
             log.error("Control pin not greater than 0")
@@ -51,6 +63,7 @@ class TemperatureController:
     def heat_off(self):
         if self.control_pin >= 0:
             GPIO.output(self.control_pin, GPIO.LOW)
+            self.heating = 0
             log.info('Turning heater OFF')
         else:
             log.error("Control pin not greater than 0")

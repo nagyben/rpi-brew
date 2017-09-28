@@ -2,4 +2,10 @@
 body {
   font-family: 'Nunito', sans-serif; }
 
+*:focus {
+  outline: none; }
+
+*::-moz-focus-inner {
+  border: 0; }
+
 /*# sourceMappingURL=main.css.map */

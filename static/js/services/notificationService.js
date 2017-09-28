@@ -1,12 +1,12 @@
 angular.module('brewery')
 	.factory('notificationService', function() {
 		return function(msg, timeout) {
-			timeout = typeof timeout === 'undefined' ? 5000 : timeout;
+			timeout = typeof timeout === 'undefined' ? 1000 : timeout;
 			new Noty({
 				text: msg,
 				type: 'info',
 				timeout: timeout,
-				theme: 'metroui',
+				// theme: 'metroui',
 				// layout: 'topCenter'
 			}).show();
 		};

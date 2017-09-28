@@ -4,10 +4,10 @@ angular.module('brewery')
     $scope.tRed = "n/a";
     $scope.tBlue = "n/a";
     $scope.tGreen = "n/a";
-    $scope.display = 'brew';
     $scope.date = new Date();
 
-    $scope.logEnabled = true;
+    $scope.logEnabled = false;
+    $scope.controlEnabled = false;
 
     $scope.prepStartTime;
     $scope.mashStartTime;
@@ -63,21 +63,35 @@ angular.module('brewery')
       $http.get('http://localhost:5000/status', 1000)
         .then(
           function success(data) {
+            $scope.connected = true;
             $scope.mode = data.data.mode;
             $scope.tRed = data.data.sensors[0].tempC;
             $scope.tBlue = data.data.sensors[1].tempC;
             $scope.tGreen = data.data.sensors[2].tempC;
             $scope.logEnabled = data.data.logEnabled;
+            $scope.controlEnabled = data.data.controlEnabled;
             $("[name='logEnabled']").bootstrapSwitch('state', $scope.logEnabled);
+            $("[name='controlEnabled']").bootstrapSwitch('state', $scope.controlEnabled);
             if (first === true) {
-              $scope.prepStartTime = data.data.prepStartTime;
-              $scope.mashStartTime = data.data.mashStartTime;
-              $scope.boilStartTime = data.data.boilStartTime;
+              console.log(data.data);
+              $scope.prepStartTime = new Date(data.data.prepStartTime * 1000);
+              $scope.mashStartTime = new Date(data.data.mashStartTime * 1000);
+              $scope.boilStartTime = new Date(data.data.boilStartTime * 1000);
               $scope.fermentStartTime = data.data.fermentStartTime;
+              $scope.redId = data.data.sensors[0].id;
+              $scope.blueId = data.data.sensors[1].id;
+              $scope.greenId = data.data.sensors[2].id;
+              $('input[name="logEnabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
+                $http.post('http://localhost:5000/log/' + state);
+              });
+              $('input[name="controlEnabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
+                $http.post('http://localhost:5000/control/' + state);
+              });
             }
           },
           function error(data) {
             // try again
+            $scope.connected = false;
             console.log("Connection failed - trying again...");
           }
         );
@@ -108,8 +122,16 @@ angular.module('brewery')
       resetTimers();
       $scope.fermentStartTime = new Date();
       $scope.mode = "ferment";
+      $("[name='controlEnabled']").bootstrapSwitch('disabled', false);
       $http.post('http://localhost:5000/ferment');
     };
+
+    $scope.stop = function() {
+      resetTimers();
+      $scope.mode = "idle";
+      $("[name='controlEnabled']").bootstrapSwitch('disabled', true);
+      $http.post('http://localhost:5000/stop');
+    }
 
     $scope.setControlEnabled = function(control) {
       $http.post('http://localhost:5000/control/' + control?1:0)
@@ -135,10 +157,5 @@ angular.module('brewery')
       }
     }
 
-    getStatus(true); // true = set first-time values.
-
-    $("[name='logEnabled']").bootstrapSwitch();
-    $('input[name="logEnabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
-      $http.post('http://localhost:5000/log/' + state);
-    });
+    getStatus(true); // true = set first-time values
   });
