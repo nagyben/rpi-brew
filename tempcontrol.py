@@ -21,7 +21,7 @@ except ImportError:
 
 
 class TemperatureController:
-    setpoint = 0
+    setpoint = 17
     time_period = 60 # time in seconds to wait between control actions
 
     control_pin = 0

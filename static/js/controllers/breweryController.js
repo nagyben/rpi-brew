@@ -19,6 +19,8 @@ angular.module('brewery')
     $scope.boilElapsed;
     $scope.fermentElapsed;
 
+    $scope.setpoint = 19;
+
     $interval(updateLoop, 1000);
 
     function updateLoop() {
@@ -70,6 +72,7 @@ angular.module('brewery')
             $scope.tGreen = data.data.sensors[2].tempC;
             $scope.logEnabled = data.data.logEnabled;
             $scope.controlEnabled = data.data.controlEnabled;
+            $scope.setpoint = data.data.setpoint;
             $("[name='logEnabled']").bootstrapSwitch('state', $scope.logEnabled);
             $("[name='controlEnabled']").bootstrapSwitch('state', $scope.controlEnabled);
             if (first === true) {
@@ -131,7 +134,7 @@ angular.module('brewery')
       $scope.mode = "idle";
       $("[name='controlEnabled']").bootstrapSwitch('disabled', true);
       $http.post('http://localhost:5000/stop');
-    }
+    };
 
     $scope.setControlEnabled = function(control) {
       $http.post('http://localhost:5000/control/' + control?1:0)
@@ -140,7 +143,7 @@ angular.module('brewery')
           $scope.controlEnabled = control;
         }
       );
-    }
+    };
 
     $scope.updateSensor = function($event) {
       if ($event.originalEvent.keyCode == 13) { // if keyCode == enter
@@ -155,6 +158,14 @@ angular.module('brewery')
         }
         // $http.post('http://localhost:5000')
       }
+    };
+
+    var lazySetpointChange =  _.debounce(function() {$http.post("http://localhost:5000/temp/" + $scope.setpoint);}, 300);
+
+    $scope.setpointChange = function(delta) {
+      $scope.setpoint = $scope.setpoint + delta;
+      $http.post("http://localhost:5000/temp/" + $scope.setpoint)
+      // lazySetpointChange();
     }
 
     getStatus(true); // true = set first-time values

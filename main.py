@@ -67,6 +67,7 @@ def get_status():
         "logEnabled": logging_enabled,
         "controlEnabled": controller.enabled,
         "heating": controller.heating,
+        "setpoint": controller.setpoint,
         "sensors": tempsensors
     })
 
@@ -221,6 +222,15 @@ def set_logging(status):
 
     update_settings()
     return jsonify({"message": message})
+
+
+@app.route("/temp/<temp>", methods=['POST'])
+def set_temperature(temp):
+    temp = int(temp)
+    if 10 <= temp <= 30:
+        controller.setpoint = temp
+        update_settings()
+        return jsonify({"message": "Temperature set to {}".format(temp)})
 
 
 # ------------------------------------------------------------------------- SETTINGS
