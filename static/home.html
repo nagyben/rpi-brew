@@ -64,17 +64,17 @@
     <div class="col-12" ng-show="mode != 'ferment'">
       <div class="row">
         <div class="col-4 text-center">
-          <h2 class="red">{{tRed | number : 1 || "n/a"}}</h2>
+          <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
           <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
           <h2>{{prepElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
-          <h2 class="blue">{{tBlue | number : 1 || "n/a"}}</h2>
+          <h2 class="blue">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
           <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
           <h2>{{mashElapsed}}</h2>
         </div>
         <div class="col-4 text-center">
-          <h2 class="green">{{tGreen | number : 1 || "n/a"}}</h2>
+          <h2 class="green">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
           <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
           <h2>{{boilElapsed}}</h2>
         </div>
@@ -87,8 +87,8 @@
           <span style="font-size: 3rem; width:200px">{{setpoint || "n/a"}} &deg;C</span>
           <button type="button" class="btn btn-outline-danger" ng-click="setpointChange(-1)"><i class="fa fa-chevron-down" aria-hidden="true"></i></button>
         </div>
-        <div class="col-6">
-          <p>{{tRed | number : 1 || "n/a"}}</p>
+        <div class="col-6 text-center">
+          <p style="font-size: 3rem">{{tRed | number : 1 || "n/a"}}</p>
         </div>
       </div>
     </div>

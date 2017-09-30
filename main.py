@@ -227,10 +227,12 @@ def set_logging(status):
 @app.route("/temp/<temp>", methods=['POST'])
 def set_temperature(temp):
     temp = int(temp)
-    if 10 <= temp <= 30:
-        controller.setpoint = temp
-        update_settings()
-        return jsonify({"message": "Temperature set to {}".format(temp)})
+    if temp < 10: temp = 10
+    if temp > 30: temp = 30
+    controller.setpoint = temp
+    update_settings()
+    return jsonify({"message": "Temperature set to {}".format(temp)})
+
 
 
 # ------------------------------------------------------------------------- SETTINGS
