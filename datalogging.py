@@ -25,7 +25,15 @@ consolehandler = logging.StreamHandler()
 consolehandler.setFormatter(appformatter)
 log.addHandler(consolehandler)
 
+log_counter = 0
+LOG_INTERVAL = 60
+
 def log_data(*argv):
-    message = ','.join(map(str, argv))
-    if len(message) > 0:
-        brewlogger.info(message)
+    global log_counter
+    if log_counter >= LOG_INTERVAL:
+        log_counter = 0
+        message = ','.join(map(str, argv))
+        if len(message) > 0:
+            brewlogger.info(message)
+    else:
+        log_counter += 1

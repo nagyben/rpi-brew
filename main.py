@@ -4,6 +4,7 @@ from tempcontrol import TemperatureController
 from threading import Timer
 import persist
 import time
+import datalogging
 from datalogging import log_data
 from flask import Flask, jsonify
 
@@ -273,12 +274,15 @@ def load_settings():
         global mode
         mode = persist.settings['mode']
 
+    if 'log_interval' in persist.settings:
+        datalogging.LOG_INTERVAL = persist.settings['log_interval']
+
 
 def loop():
     for sensor in sensors:
         sensor.update()
 
-    if (logging_enabled):
+    if logging_enabled:
         log_data(
             sensors[0].tempC,
             sensors[1].tempC,

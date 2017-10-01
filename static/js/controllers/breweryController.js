@@ -1,5 +1,5 @@
 angular.module('brewery')
-  .controller('BreweryController', function($scope, $http, $interval, notificationService) {
+  .controller('BreweryController', function($scope, $http, $interval) {
     $scope.mode = "idle";
     $scope.tRed = "n/a";
     $scope.tBlue = "n/a";
@@ -20,6 +20,10 @@ angular.module('brewery')
     $scope.fermentElapsed;
 
     $scope.setpoint = 19;
+
+    $scope.OG = 1100;
+    $scope.FG = 1000;
+    $scope.ABV = "";
 
     $interval(updateLoop, 1000);
 
@@ -80,7 +84,7 @@ angular.module('brewery')
               $scope.prepStartTime = new Date(data.data.prepStartTime * 1000);
               $scope.mashStartTime = new Date(data.data.mashStartTime * 1000);
               $scope.boilStartTime = new Date(data.data.boilStartTime * 1000);
-              $scope.fermentStartTime = data.data.fermentStartTime;
+              $scope.fermentStartTime = new Date(data.data.fermentStartTime * 1000);
               $scope.redId = data.data.sensors[0].id;
               $scope.blueId = data.data.sensors[1].id;
               $scope.greenId = data.data.sensors[2].id;
@@ -98,6 +102,11 @@ angular.module('brewery')
             console.log("Connection failed - trying again...");
           }
         );
+    }
+
+    function calcABV(og, fg) {
+      // https://www.brewersfriend.com/2011/06/16/alcohol-by-volume-calculator-updated/
+      return (76.08 * (og-fg) / (1.775-og)) * (fg / 0.794);
     }
 
     $scope.startPrep = function() {
@@ -160,12 +169,15 @@ angular.module('brewery')
       }
     };
 
-    var lazySetpointChange =  _.debounce(function() {$http.post("http://localhost:5000/temp/" + $scope.setpoint);}, 300);
-
     $scope.setpointChange = function(delta) {
       $scope.setpoint = $scope.setpoint + delta;
       $http.post("http://localhost:5000/temp/" + $scope.setpoint)
-      // lazySetpointChange();
+    }
+
+    $scope.onOGFGChange = function() {
+      if ($scope.FG / 1000 >= 1 && $scope.OG / 1000 >= 1) {
+        $scope.ABV = calcABV($scope.OG / 1000, $scope.FG / 1000);
+      }
     }
 
     getStatus(true); // true = set first-time values
