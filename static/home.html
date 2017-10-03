@@ -6,22 +6,17 @@
 
   <script src="static/js/lib/jquery.slim.min.js"></script>
   <script src="static/js/lib/angular.min.js"></script>
-  <!-- <script src="static/js/lib/tether.min.js"></script> -->
-  <!-- <script src="static/js/lib/sizzle.min.js"></script> -->
   <script src="static/js/lib/bootstrap.min.js"></script>
   <script src="static/js/lib/bootstrap-switch.min.js"></script>
-  <!-- <script src="static/js/lib/noty.min.js"></script> -->
-  <!-- <script src="static/js/lib/underscore.min.js"></script> -->
+  <script src="static/js/lib/chartist.min.js"></script>
 
   <script src="static/js/app.js"></script>
-  <!-- <script src="static/js/services/httpInterceptor.js"></script> -->
-  <!-- <script src="static/js/services/notificationService.js"></script> -->
   <script src="static/js/controllers/breweryController.js"></script>
 
 
   <link rel="stylesheet" href="static/css/lib/bootstrap.min.css" />
-  <!-- <link rel="stylesheet" href="static/css/lib/noty.css" /> -->
   <link rel="stylesheet" href="static/css/lib/bootstrap-switch.min.css" />
+  <link rel="stylesheet" href="static/css/lib/chartist.min.css" />
   <link rel="stylesheet" href="static/css/main.css" />
   <link rel="stylesheet" href="static/font-awesome-4.7.0/css/font-awesome.min.css" />
 
@@ -32,26 +27,19 @@
 </head>
 
 <body ng-app="brewery">
-  <div class="container-fluid" ng-controller="BreweryController">
-    <h1 class="text-center">{{date | date : "EEEE dd MMM yyyy"}}</h1>
-    <div class="alert alert-danger text-center" role="alert" ng-show="!connected">
-      Connection lost. Reconnecting... <i class="fa fa-spinner fa-pulse fa-fw"></i>
+  <div class="container-fluid p-0 d-flex flex-column" style="width:800px; height: 480px; border:1px solid red" ng-controller="BreweryController">
+    <div class="pt-2 px-2">
+      <button class="btn btn-inline-block" style="float:left" ng-click="forceReload()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
+      <h1 class="text-center">{{date | date : "EEEE dd MMM yyyy HH:mm:ss"}}</h1>
     </div>
-    <div class="col-12 text-center">
-      <div class="col-12 my-4">
-        <h1 class="text-center">{{mode | uppercase}}</h1>
-        <div class="col-12 mb-2">
-          <span style="width:100px; display:inline-block" class="text-right">Logging</span>
-          <input class="text-center" type="checkbox" name="logEnabled" />
-        </div>
-
-        <div class="col-12">
-          <span style="width:100px; display:inline-block" class="text-right">Control</span>
-          <input class="text-center" type="checkbox" name="controlEnabled"/>
-        </div>
+    <div class="px-3">
+      <div class="alert alert-danger text-center" role="alert" ng-show="!connected">
+        Connection lost. Reconnecting... <i class="fa fa-spinner fa-pulse fa-fw"></i>
       </div>
-      <nav class="mb-5">
-        <ul class="pagination justify-content-center">
+    </div>
+    <div class="text-center p-0">
+      <nav class="mb-1">
+        <ul class="pagination justify-content-center mb-0">
           <li class="page-item" ng-class="{disabled: mode != 'ferment'}" style="width:150px; font-weight:bold">
             <a class="page-link" href="#" tabindex="-1" ng-click="stop()">Brew</a>
           </li>
@@ -60,46 +48,72 @@
           </li>
         </ul>
       </nav>
-    </div>
-    <div class="col-12" ng-show="mode != 'ferment'">
-      <div class="row">
-        <div class="col-4 text-center">
-          <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
-          <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
-          <h2>{{prepElapsed}}</h2>
-        </div>
-        <div class="col-4 text-center">
-          <h2 class="blue">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
-          <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
-          <h2>{{mashElapsed}}</h2>
-        </div>
-        <div class="col-4 text-center">
-          <h2 class="green">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
-          <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
-          <h2>{{boilElapsed}}</h2>
-        </div>
+      <div class="col-12 p-0">
+        <h1 class="text-center">{{mode | uppercase}}</h1>{{performanceMetric | number : 2}}ms
       </div>
     </div>
-    <div class="col-12" ng-show="mode == 'ferment'">
-      <div class="row">
-        <div class="col-6 text-center" style="display: flex;justify-content: center;">
-          <button type="button" class="btn btn-outline-success" ng-click="setpointChange(1)"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
-          <span style="font-size: 3rem; width:200px">{{setpoint || "n/a"}} &deg;C</span>
-          <button type="button" class="btn btn-outline-danger" ng-click="setpointChange(-1)"><i class="fa fa-chevron-down" aria-hidden="true"></i></button>
+    <div class="d-flex p-0" style="flex-grow: 1">
+      <div class="col-2 p-0 d-flex flex-column justify-content-center text-center">
+        <div class="mb-1">
+          <span class="d-block" class="text-center">Logging</span>
+          <input class="text-center mb-1" type="checkbox" name="logEnabled" />
         </div>
-        <div class="col-6 text-center">
-          <p style="font-size: 3rem">{{tRed | number : 1 || "n/a"}} &deg;C</p>
+        <div>
+          <span class="d-block" class="text-center">Control</span>
+          <input class="text-center" type="checkbox" name="controlEnabled" />
         </div>
-        <div class="col-6 text-center mt-2">
-          <h2>{{fermentStartTime | date : "dd-MM-yyyy HH:mm"}}</h2>
+      </div>
+      <div class="col-10 p-0" ng-show="mode != 'ferment'">
+        <div class="row">
+          <div class="col-4 text-center">
+            <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
+            <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
+            <h2>{{prepElapsed}}</h2>
+          </div>
+          <div class="col-4 text-center">
+            <h2 class="blue">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
+            <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
+            <h2>{{mashElapsed}}</h2>
+          </div>
+          <div class="col-4 text-center">
+            <h2 class="green">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
+            <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
+            <h2>{{boilElapsed}}</h2>
+          </div>
         </div>
-        <div class="col-6 text-center mt-2">
-          <h2>{{fermentElapsed}}</h2>
-        </div>
-        <div class="col-6 my-3">
-          <input type="number" class="form-control" placeholder="OG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="OG" ng-change="onOGFGChange()" />
-          <input type="number" class="form-control" placeholder="FG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="FG" ng-change="onOGFGChange()" />
-          <h2>{{ABV | number : 2}} % ABV</h2>
+      </div>
+      <div class="col-10 p-0" ng-show="mode == 'ferment'">
+        <div class="row">
+          <div class="col-6 text-center" style="display: flex;justify-content: center;">
+            <button type="button" class="btn btn-outline-success" ng-click="setpointChange(1)"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
+            <span style="font-size: 3rem; width:200px">{{setpoint || "n/a"}} &deg;C</span>
+            <button type="button" class="btn btn-outline-danger" ng-click="setpointChange(-1)"><i class="fa fa-chevron-down" aria-hidden="true"></i></button>
+          </div>
+          <div class="col-6 text-center">
+            <span style="font-size: 3rem">{{tRed | number : 1 || "n/a"}} &deg;C</span>
+          </div>
+          <div class="col-6 text-center mt-2">
+            <h2>{{fermentStartTime | date : "dd-MM-yyyy HH:mm"}}</h2>
+          </div>
+          <div class="col-6 text-center mt-2">
+            <h2>{{fermentElapsed}}</h2>
+          </div>
+          <div class="col-6 d-flex flex-wrap align-items-center justify-content-center">
+            <div class="col-12 p-0 row d-flex align-items-center justify-content-center">
+              <span style="width:50px" class="text-right">OG</span>
+              <input type="number" class="form-control ml-1" placeholder="OG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="OG" ng-change="onOGFGChange()" />
+              <button type="button" class="btn btn-inline ml-1" style="width: 70px">Save</button>
+            </div>
+            <div class="col-12 p-0 row d-flex align-items-center justify-content-center my-1">
+              <span style="width:50px" class="text-right">FG</span>
+              <input type="number" class="form-control ml-1" placeholder="FG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="FG" ng-change="onOGFGChange()" />
+              <button type="button" class="btn btn-inline ml-1" style="width: 70px">Log</button>
+            </div>
+            <h2>{{ABV | number : 2}} % ABV</h2>
+          </div>
+          <div class="col-6">
+            <div class="ct-chart"></div>
+          </div>
         </div>
       </div>
     </div>

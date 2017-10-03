@@ -37,6 +37,8 @@ ferment_start_time = None
 
 logging_enabled = False
 
+time_taken = 0
+
 # ------------------------------------------------------------------------- FLASK API
 
 app = Flask(__name__)
@@ -69,7 +71,8 @@ def get_status():
         "controlEnabled": controller.enabled,
         "heating": controller.heating,
         "setpoint": controller.setpoint,
-        "sensors": tempsensors
+        "sensors": tempsensors,
+        "performanceMetric": time_taken
     })
 
 
@@ -279,6 +282,8 @@ def load_settings():
 
 
 def loop():
+    global time_taken
+    start_time = time.time()
     for sensor in sensors:
         sensor.update()
 
@@ -296,6 +301,8 @@ def loop():
         controller.enabled = False
 
     update_settings()
+
+    time_taken = (time.time() - start_time) * 1000
 
     # Restart loop
     t = Timer(1, loop)

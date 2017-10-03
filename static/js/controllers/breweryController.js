@@ -1,5 +1,5 @@
 angular.module('brewery')
-  .controller('BreweryController', function($scope, $http, $interval) {
+  .controller('BreweryController', function($scope, $http, $interval, $timeout) {
     $scope.mode = "idle";
     $scope.tRed = "n/a";
     $scope.tBlue = "n/a";
@@ -24,6 +24,8 @@ angular.module('brewery')
     $scope.OG = 1100;
     $scope.FG = 1000;
     $scope.ABV = "";
+
+    $scope.performanceMetric;
 
     $interval(updateLoop, 1000);
 
@@ -70,6 +72,7 @@ angular.module('brewery')
         .then(
           function success(data) {
             $scope.connected = true;
+            $scope.performanceMetric = data.data.performanceMetric;
             $scope.mode = data.data.mode;
             $scope.tRed = data.data.sensors[0].tempC;
             $scope.tBlue = data.data.sensors[1].tempC;
@@ -106,7 +109,7 @@ angular.module('brewery')
 
     function calcABV(og, fg) {
       // https://www.brewersfriend.com/2011/06/16/alcohol-by-volume-calculator-updated/
-      return (76.08 * (og-fg) / (1.775-og)) * (fg / 0.794);
+      return (76.08 * (og - fg) / (1.775 - og)) * (fg / 0.794);
     }
 
     $scope.startPrep = function() {
@@ -146,21 +149,27 @@ angular.module('brewery')
     };
 
     $scope.setControlEnabled = function(control) {
-      $http.post('http://localhost:5000/control/' + control?1:0)
-      .then(
-        function success(data) {
-          $scope.controlEnabled = control;
-        }
-      );
+      $http.post('http://localhost:5000/control/' + control ? 1 : 0)
+        .then(
+          function success(data) {
+            $scope.controlEnabled = control;
+          }
+        );
     };
 
     $scope.updateSensor = function($event) {
       if ($event.originalEvent.keyCode == 13) { // if keyCode == enter
         var name = "";
         switch ($event.currentTarget.id) {
-          case 'redId': name = 'red'; break;
-          case 'blueId': name = 'blue'; break;
-          case 'greenId': name = 'green'; break;
+          case 'redId':
+            name = 'red';
+            break;
+          case 'blueId':
+            name = 'blue';
+            break;
+          case 'greenId':
+            name = 'green';
+            break;
         }
         if (name !== "") {
           $http.post('http://localhost:5000/sensor/' + name + '/' + $event.currentTarget.value);
@@ -180,5 +189,22 @@ angular.module('brewery')
       }
     }
 
+    $scope.forceReload = function() {
+      window.location.reload();
+    }
+
     getStatus(true); // true = set first-time values
+
+    var data = {
+      labels: [1, 2, 3, 4, 5],
+      series: [[1, 2, 3, 4, 5]]
+    };
+
+    var options = {
+      // width: 300,
+      // height: 200
+    }
+    $timeout(function() {
+      new Chartist.Line('.ct-chart', data, options);
+    }, 1000)
   });
