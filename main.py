@@ -295,7 +295,7 @@ def loop():
             mode
         )
 
-    if (mode == "ferment"):
+    if controller.enabled and mode == "ferment":
         controller.control(sensors[0].tempC)
     else:
         controller.enabled = False
