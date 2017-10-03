@@ -27,7 +27,7 @@
 </head>
 
 <body ng-app="brewery">
-  <div class="container-fluid p-0 d-flex flex-column" controller="BreweryController">
+  <div class="container-fluid p-0 d-flex flex-column" style="width:800px; height:480px;" ng-controller="BreweryController">
     <div class="pt-2 px-2">
       <button class="btn btn-inline-block" style="float:left" ng-click="forceReload()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
       <span style="float: left; color:rgba(0,0,0,0.2)">v0.11</span>
@@ -64,7 +64,7 @@
           <input class="text-center" type="checkbox" name="controlEnabled" />
         </div>
       </div>
-      <div class="col-10 p-0" ng-show="mode != 'ferment'">
+      <div class="col-10 px-2" ng-show="mode != 'ferment'">
         <div class="row">
           <div class="col-4 text-center">
             <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
