@@ -202,6 +202,7 @@ def set_control(status):
         log.info("Unknown control request")
         message = "Unknown control request '{}'".format(status)
 
+    do_control()
     update_settings()
     return jsonify({"message": message})
 
@@ -236,7 +237,6 @@ def set_temperature(temp):
     controller.setpoint = temp
     update_settings()
     return jsonify({"message": "Temperature set to {}".format(temp)})
-
 
 
 # ------------------------------------------------------------------------- SETTINGS
@@ -281,12 +281,19 @@ def load_settings():
         datalogging.LOG_INTERVAL = persist.settings['log_interval']
 
 
-def loop():
-    global time_taken
-    start_time = time.time()
+def update_sensors():
     for sensor in sensors:
         sensor.update()
 
+
+def do_control():
+    if controller.enabled and mode == "ferment":
+        controller.control(sensors[0].tempC)
+    else:
+        controller.enabled = False
+
+
+def do_logging():
     if logging_enabled:
         log_data(
             sensors[0].tempC,
@@ -295,11 +302,14 @@ def loop():
             mode
         )
 
-    if controller.enabled and mode == "ferment":
-        controller.control(sensors[0].tempC)
-    else:
-        controller.enabled = False
 
+def loop():
+    global time_taken
+    start_time = time.time()
+
+    update_sensors()
+    do_logging()
+    do_control()
     update_settings()
 
     time_taken = (time.time() - start_time) * 1000

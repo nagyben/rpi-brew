@@ -30,7 +30,6 @@
   <div class="container-fluid p-0 d-flex flex-column" style="width:800px; height:480px;" ng-controller="BreweryController">
     <div class="pt-2 px-2">
       <button class="btn btn-inline-block" style="float:left" ng-click="forceReload()"><i class="fa fa-refresh" aria-hidden="true"></i></button>
-      <span style="float: left; color:rgba(0,0,0,0.2)">v0.12</span>
       <h1 class="text-center">{{date | date : "EEEE dd MMM yyyy HH:mm:ss"}}</h1>
     </div>
     <div class="px-3">
@@ -50,7 +49,7 @@
         </ul>
       </nav>
       <div class="col-12 p-0">
-        <h1 class="text-center">{{mode | uppercase}}</h1>{{performanceMetric | number : 2}}ms
+        <h1 class="text-center">{{mode | uppercase}}</h1>
       </div>
     </div>
     <div class="d-flex p-0" style="flex-grow: 1">
@@ -65,7 +64,7 @@
         </div>
       </div>
       <div class="col-10 px-2" ng-show="mode != 'ferment'">
-        <div class="row">
+        <div class="col-12 row p-0">
           <div class="col-4 text-center">
             <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
@@ -117,6 +116,9 @@
           </div>
         </div>
       </div>
+    </div>
+    <div class="text-center" style="color:rgba(0,0,0,0.3)">
+      v0.13 --- {{performanceMetric | number : 0}}ms
     </div>
   </div>
 </body>
