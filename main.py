@@ -305,7 +305,7 @@ def loop():
     time_taken = (time.time() - start_time) * 1000
 
     # Restart loop
-    t = Timer(1, loop)
+    t = Timer(5, loop)
     t.start()
 
 # ------------------------------------------------------------------------- START
