@@ -8,6 +8,7 @@
   <script src="static/js/lib/angular.min.js"></script>
   <script src="static/js/lib/bootstrap.min.js"></script>
   <script src="static/js/lib/bootstrap-switch.min.js"></script>
+  <script src="static/js/lib/moment.js"></script>
   <script src="static/js/lib/chartist.min.js"></script>
 
   <script src="static/js/app.js"></script>
@@ -49,7 +50,7 @@
         </ul>
       </nav>
       <div class="col-12 p-0">
-        <h1 class="text-center">{{mode | uppercase}}</h1>
+        <h1 class="text-center" style="font-weight: bold">{{mode | uppercase}}</h1>
       </div>
     </div>
     <div class="d-flex p-0" style="flex-grow: 1">
@@ -66,24 +67,24 @@
       <div class="col-10 px-2 d-flex align-items-center" ng-show="mode != 'ferment'">
         <div class="col-12 row p-0">
           <div class="col-4 text-center">
-            <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
+            <h2>{{tRed | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
-            <h2>{{prepElapsed}}</h2>
+            <h2 class="mt-2">{{prepElapsed}}</h2>
           </div>
           <div class="col-4 text-center">
-            <h2 class="mt-2">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
+            <h2>{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
             <h2 class="mt-2">{{mashElapsed}}</h2>
           </div>
           <div class="col-4 text-center">
-            <h2 class="mt-2">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
+            <h2>{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
-            <h2>{{boilElapsed}}</h2>
+            <h2 class="mt-2">{{boilElapsed}}</h2>
           </div>
         </div>
       </div>
-      <div class="col-10 p-0" ng-show="mode == 'ferment'">
-        <div class="row">
+      <div class="col-10 p-0 d-flex" ng-show="mode == 'ferment'">
+        <div class="d-flex flex-wrap">
           <div class="col-6 text-center" style="display: flex;justify-content: center;">
             <button type="button" class="btn btn-outline-success" ng-click="setpointChange(1)"><i class="fa fa-chevron-up" aria-hidden="true"></i></button>
             <span style="font-size: 3rem; width:200px">{{setpoint || "n/a"}} &deg;C</span>
@@ -99,15 +100,14 @@
             <h2>{{fermentElapsed}}</h2>
           </div>
           <div class="col-6 d-flex flex-wrap align-items-center justify-content-center">
-            <div class="col-12 p-0 row d-flex align-items-center justify-content-center">
-              <span style="width:50px" class="text-right">OG</span>
-              <input type="number" class="form-control ml-1" placeholder="OG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="OG" ng-change="onOGFGChange()" />
-              <button type="button" class="btn btn-inline ml-1" style="width: 70px">Save</button>
+            <div class="col-12 p-0 text-center" ng-show="chartData[0].y">
+              OG: {{chartData[0].y}}
             </div>
             <div class="col-12 p-0 row d-flex align-items-center justify-content-center my-1">
-              <span style="width:50px" class="text-right">FG</span>
+              <span style="width:50px" class="text-right">{{ chartData.length > 0 ? "SG":"OG"}}</span>
               <input type="number" class="form-control ml-1" placeholder="FG" min="1000" max="1100" style="width:100px" maxlength="4" ng-model="FG" ng-change="onOGFGChange()" />
-              <button type="button" class="btn btn-inline ml-1" style="width: 70px">Log</button>
+              <button type="button" class="btn btn-inline ml-1" style="width: 70px" ng-click="logGravity(FG)">Log</button>
+              <button type="button" class="btn btn-inline ml-1 btn-danger" ng-click="deleteLastGravity()"><i class="fa fa-times" aria-hidden="true"></i></button>
             </div>
             <h2>{{ABV | number : 2}} % ABV</h2>
           </div>

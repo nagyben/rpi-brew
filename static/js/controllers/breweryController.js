@@ -1,31 +1,18 @@
 angular.module('brewery')
   .controller('BreweryController', function($scope, $http, $interval, $timeout) {
     $scope.mode = "idle";
-    $scope.tRed = "n/a";
-    $scope.tBlue = "n/a";
-    $scope.tGreen = "n/a";
     $scope.date = new Date();
 
     $scope.logEnabled = false;
     $scope.controlEnabled = false;
 
-    $scope.prepStartTime;
-    $scope.mashStartTime;
-    $scope.boilStartTime;
-    $scope.fermentStartTime;
-
-    $scope.prepElapsed;
-    $scope.mashElapsed;
-    $scope.boilElapsed;
-    $scope.fermentElapsed;
-
     $scope.setpoint = 19;
 
-    $scope.OG = 1100;
-    $scope.FG = 1000;
+    $scope.FG = 1100;
     $scope.ABV = "";
 
-    $scope.performanceMetric;
+    var chart;
+    $scope.chartData = [];
 
     $interval(updateLoop, 1000);
 
@@ -97,6 +84,8 @@ angular.module('brewery')
               $('input[name="controlEnabled"]').on('switchChange.bootstrapSwitch', function(event, state) {
                 $http.post('http://localhost:5000/control/' + state);
               });
+              loadChartData(data);
+              $scope.onOGFGChange();
             }
           },
           function error(data) {
@@ -159,11 +148,11 @@ angular.module('brewery')
 
     $scope.forceUpdate = function() {
       $http.post('http://localhost:5000/force-update')
-      .then(
-        function success(data) {
-          $scope.forceReload();
-        }
-      )
+        .then(
+          function success(data) {
+            $scope.forceReload();
+          }
+        )
     }
 
     $scope.updateSensor = function($event) {
@@ -193,8 +182,13 @@ angular.module('brewery')
     }
 
     $scope.onOGFGChange = function() {
-      if ($scope.FG / 1000 >= 1 && $scope.OG / 1000 >= 1) {
-        $scope.ABV = calcABV($scope.OG / 1000, $scope.FG / 1000);
+      var og = $scope.chartData[0] ? $scope.chartData[0].y : 0;
+      if (og) {
+        if ($scope.FG / 1000 >= 1 && og / 1000 >= 1) {
+          $scope.ABV = calcABV(og / 1000, $scope.FG / 1000);
+        }
+      } else {
+        $scope.ABV = 0;
       }
     }
 
@@ -202,18 +196,63 @@ angular.module('brewery')
       window.location.reload();
     }
 
-    getStatus(true); // true = set first-time values
-
-    var data = {
-      labels: [1, 2, 3, 4, 5],
-      series: [[1, 2, 3, 4, 5]]
-    };
-
-    var options = {
-      // width: 300,
-      // height: 200
+    $scope.logGravity = function(gravity) {
+      $http.post('http://localhost:5000/sg/' + gravity)
+        .then(
+          function success(data) {
+            $scope.chartData.push({
+              x: new Date(),
+              y: gravity
+            });
+            updateChart();
+          }
+        )
     }
+
+    $scope.deleteLastGravity = function() {
+      $http.delete('http://localhost:5000/sg')
+        .then(
+          function success(data) {
+            $scope.chartData.pop();
+            $scope.onOGFGChange();
+            updateChart();
+          }
+        )
+    }
+
+    function updateChart() {
+      var data = {
+        series: [{
+          name: 'sg',
+          data: $scope.chartData
+        }]
+      };
+      chart.update(data);
+    }
+
+    function loadChartData(data) {
+      specificGravity = data.data.specificGravity
+      for (var i = 0; i < specificGravity.length; i++) {
+        $scope.chartData.push({
+          x: new Date(specificGravity[i][0] * 1000),
+          y: specificGravity[i][1]
+        });
+      }
+      $scope.FG = $scope.chartData[0] ? $scope.chartData[$scope.chartData.length-1].y : 1100;
+    }
+
+    getStatus(true); // true = set first-time
+
     $timeout(function() {
-      new Chartist.Line('.ct-chart', data, options);
-    }, 1000)
+      chart = new Chartist.Line('.ct-chart', {}, {
+        axisX: {
+          type: Chartist.FixedScaleAxis,
+          divisor: 5,
+          labelInterpolationFnc: function(value) {
+            return moment(value).format('MMM D');
+          }
+        }
+      });
+      updateChart();
+    }, 1000);
   });

@@ -40,6 +40,8 @@ logging_enabled = False
 
 time_taken = 0
 
+specific_gravity = list()
+
 # ------------------------------------------------------------------------- FLASK API
 
 app = Flask(__name__)
@@ -73,7 +75,8 @@ def get_status():
         "heating": controller.heating,
         "setpoint": controller.setpoint,
         "sensors": tempsensors,
-        "performanceMetric": time_taken
+        "performanceMetric": time_taken,
+        "specificGravity": specific_gravity
     })
 
 
@@ -249,6 +252,39 @@ def force_git_update():
     return jsonify({"message": message})
 
 
+@app.route("/sg/<sg>", methods=['POST'])
+def add_gravity(sg):
+    sg = int(sg)
+    log.info("Request to add gravity reading")
+    specific_gravity.append([time.time(), sg])
+    if len(specific_gravity) == 1:
+        message = "Adding OG {}".format(sg)
+    else:
+        message = "Adding SG {}".format(sg)
+    update_settings()
+    return jsonify({"message": message})
+
+
+@app.route("/sg", methods=['DELETE'])
+def delete_gravity():
+    log.info("Request to remove last gravity reading")
+    if len(specific_gravity) > 0:
+        # maybe limit to removing gravity readings in the last hour?
+        last_time = specific_gravity[-1][0]
+        if time.time() - last_time < 3600:
+            specific_gravity.pop()
+            message = "Removed last reading"
+        else:
+            message = "Last reading not removed - over an hour old"
+    else:
+        message = "Nothing to remove"
+
+    update_settings()
+    return jsonify({"message": message})
+
+
+
+
 # ------------------------------------------------------------------------- SETTINGS
 
 
@@ -260,6 +296,7 @@ def update_settings():
     persist.settings['logEnabled'] = logging_enabled
     persist.settings['controlEnabled'] = controller.enabled
     persist.settings['mode'] = mode
+    persist.settings['sg'] = specific_gravity
     persist.save(SETTINGS_FILE)
 
 
@@ -289,6 +326,10 @@ def load_settings():
 
     if 'log_interval' in persist.settings:
         datalogging.LOG_INTERVAL = persist.settings['log_interval']
+
+    if 'sg' in persist.settings:
+        global specific_gravity
+        specific_gravity = persist.settings['sg']
 
 
 def update_sensors():
