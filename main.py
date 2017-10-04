@@ -7,6 +7,7 @@ import time
 import datalogging
 from datalogging import log_data
 from flask import Flask, jsonify
+import subprocess
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)
@@ -237,6 +238,15 @@ def set_temperature(temp):
     controller.setpoint = temp
     update_settings()
     return jsonify({"message": "Temperature set to {}".format(temp)})
+
+
+@app.route("/force-update", methods=['POST'])
+def force_git_update():
+    log.info("Requested git update of program")
+    message = subprocess.run(["git", "pull"], stdout=subprocess.PIPE).stdout
+    message = message.decode("utf-8")
+    log.info(message)
+    return jsonify({"message": message})
 
 
 # ------------------------------------------------------------------------- SETTINGS

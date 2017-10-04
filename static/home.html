@@ -63,7 +63,7 @@
           <input class="text-center" type="checkbox" name="controlEnabled" />
         </div>
       </div>
-      <div class="col-10 px-2" ng-show="mode != 'ferment'">
+      <div class="col-10 px-2 d-flex align-items-center" ng-show="mode != 'ferment'">
         <div class="col-12 row p-0">
           <div class="col-4 text-center">
             <h2 class="red">{{tRed | number : 1 || "n/a"}} &deg;C</h2>
@@ -71,12 +71,12 @@
             <h2>{{prepElapsed}}</h2>
           </div>
           <div class="col-4 text-center">
-            <h2 class="blue">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
+            <h2 class="mt-2">{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
-            <h2>{{mashElapsed}}</h2>
+            <h2 class="mt-2">{{mashElapsed}}</h2>
           </div>
           <div class="col-4 text-center">
-            <h2 class="green">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
+            <h2 class="mt-2">{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
             <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
             <h2>{{boilElapsed}}</h2>
           </div>
@@ -118,7 +118,7 @@
       </div>
     </div>
     <div class="text-center" style="color:rgba(0,0,0,0.3)">
-      v0.13 --- {{performanceMetric | number : 0}}ms
+      v0.13 --- {{performanceMetric | number : 0}}ms --- <a href="#" ng-click="forceUpdate()">force update</button>
     </div>
   </div>
 </body>

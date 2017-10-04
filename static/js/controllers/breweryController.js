@@ -157,6 +157,15 @@ angular.module('brewery')
         );
     };
 
+    $scope.forceUpdate = function() {
+      $http.post('http://localhost:5000/force-update')
+      .then(
+        function success(data) {
+          $scope.forceReload();
+        }
+      )
+    }
+
     $scope.updateSensor = function($event) {
       if ($event.originalEvent.keyCode == 13) { // if keyCode == enter
         var name = "";
