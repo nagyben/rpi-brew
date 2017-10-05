@@ -26,7 +26,7 @@ consolehandler.setFormatter(appformatter)
 log.addHandler(consolehandler)
 
 log_counter = 0
-LOG_INTERVAL = 30
+LOG_INTERVAL = 10
 
 def log_data(*argv):
     global log_counter
