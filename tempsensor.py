@@ -34,22 +34,22 @@ class TemperatureSensor:
         else:
             path = DEVICE_PATH + self.sensor_id + '/w1_slave'
             try:
-                f = open(path)
-                lines = f.readlines()
+                with open(path) as f:
+                    lines = f.readlines()
 
-                if lines[0].strip()[-3:] == 'YES':
-                    equals_pos = lines[1].find('t=')
+                    if lines[0].strip()[-3:] == 'YES':
+                        equals_pos = lines[1].find('t=')
 
-                    if equals_pos != -1:
-                        temp_string = lines[1][equals_pos + 2:]
-                        temp_c = float(temp_string) / 1000.0
-                        return temp_c
+                        if equals_pos != -1:
+                            temp_string = lines[1][equals_pos + 2:]
+                            temp_c = float(temp_string) / 1000.0
+                            return temp_c
+
+                        else:
+                            return -1
 
                     else:
                         return -1
-
-                else:
-                    return -1
 
             except Exception as e:
                 log.error(e)
