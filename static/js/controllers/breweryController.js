@@ -305,9 +305,9 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('D-MMM');
-          },
-          showPoint: false
-        }
+          }
+        },
+        showPoint: false
       });
       updateFermentChart();
 
@@ -317,9 +317,9 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          },
-          showPoint: false
-        }
+          }
+        },
+        showPoint: false
       });
 
       chartGreen = new Chartist.Line('.ct-chart-green', {}, {
@@ -328,9 +328,9 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          },
-          showPoint: false
-        }
+          }
+        },
+        showPoint: false
       });
 
       chartBlue = new Chartist.Line('.ct-chart-blue', {}, {
@@ -339,9 +339,9 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          },
-          showPoint: false
-        }
+          }
+        },
+        showPoint: false
       });
 
       updateTempCharts();
