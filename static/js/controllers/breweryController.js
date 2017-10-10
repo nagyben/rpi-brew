@@ -97,6 +97,8 @@ angular.module('brewery')
               $scope.onOGFGChange();
             }
 
+            tempIntervalCounter++;
+            
             if (tempIntervalCounter > 10) {
               tempIntervalCounter = 0;
               if (data.data.sensors[0].tempC) {
