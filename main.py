@@ -5,7 +5,7 @@ from threading import Timer
 import persist
 import time
 import datalogging
-from datalogging import log_data
+from datalogging import log_brew_data, log_ferment_data
 from flask import Flask, jsonify
 import subprocess
 
@@ -346,12 +346,15 @@ def do_control():
 
 def do_logging():
     if logging_enabled:
-        log_data(
-            sensors[0].tempC,
-            sensors[1].tempC,
-            sensors[2].tempC,
-            mode
-        )
+        if mode.lower() != 'ferment':
+            log_brew_data(
+                sensors[0].tempC,
+                sensors[1].tempC,
+                sensors[2].tempC,
+                mode
+            )
+        else:
+            log_ferment_data(sensors[0].tempC)
 
 
 def loop():

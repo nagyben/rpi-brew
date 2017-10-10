@@ -11,8 +11,15 @@ angular.module('brewery')
     $scope.FG = 1100;
     $scope.ABV = "";
 
-    var chart;
-    $scope.chartData = [];
+    var chartRed;
+    var chartBlue;
+    var chartGreen;
+    var chartDataRed = [];
+    var chartDataBlue = [];
+    var chartDataGreen = [];
+
+    var chartFerment;
+    $scope.chartDataFerment = [];
 
     $interval(updateLoop, 1000);
 
@@ -54,6 +61,8 @@ angular.module('brewery')
       $scope.fermentStartTime = 0;
     }
 
+    var tempIntervalCounter = 0;
+
     function getStatus(first) {
       $http.get('http://localhost:5000/status', 1000)
         .then(
@@ -86,6 +95,29 @@ angular.module('brewery')
               });
               loadChartData(data);
               $scope.onOGFGChange();
+            }
+
+            if (tempIntervalCounter > 10) {
+              tempIntervalCounter = 0;
+              if (data.data.sensors[0].tempC) {
+                chartDataRed.push({
+                  x: new Date(),
+                  y: data.data.sensors[0].tempC
+                });
+              }
+              if (data.data.sensors[1].tempC) {
+                chartDataBlue.push({
+                  x: new Date(),
+                  y: data.data.sensors[1].tempC
+                });
+              }
+
+              if (data.data.sensors[2].tempC) {
+                chartDataGreen.push({
+                  x: new Date(),
+                  y: data.data.sensors[2].tempC
+                });
+              }
             }
           },
           function error(data) {
@@ -182,7 +214,7 @@ angular.module('brewery')
     }
 
     $scope.onOGFGChange = function() {
-      var og = $scope.chartData[0] ? $scope.chartData[0].y : 0;
+      var og = $scope.chartDataFerment[0] ? $scope.chartDataFerment[0].y : 0;
       if (og) {
         if ($scope.FG / 1000 >= 1 && og / 1000 >= 1) {
           $scope.ABV = calcABV(og / 1000, $scope.FG / 1000);
@@ -200,7 +232,7 @@ angular.module('brewery')
       $http.post('http://localhost:5000/sg/' + gravity)
         .then(
           function success(data) {
-            $scope.chartData.push({
+            $scope.chartDataFerment.push({
               x: new Date(),
               y: gravity
             });
@@ -213,46 +245,98 @@ angular.module('brewery')
       $http.delete('http://localhost:5000/sg')
         .then(
           function success(data) {
-            $scope.chartData.pop();
+            $scope.chartDataFerment.pop();
             $scope.onOGFGChange();
             updateChart();
           }
         )
     }
 
-    function updateChart() {
+    function updateFermentChart() {
       var data = {
         series: [{
           name: 'sg',
-          data: $scope.chartData
+          data: $scope.chartDataFerment
         }]
       };
-      chart.update(data);
+      chartFerment.update(data);
+    }
+
+    function updateTempCharts() {
+      chartRed.update({
+        series: [{
+          data: chartDataRed
+        }]
+      });
+
+      chartBlue.update({
+        series: [{
+          data: chartDataBlue
+        }]
+      });
+
+      chartGreen.update({
+        series: [{
+          data: chartDataGreen
+        }]
+      });
     }
 
     function loadChartData(data) {
       specificGravity = data.data.specificGravity
       for (var i = 0; i < specificGravity.length; i++) {
-        $scope.chartData.push({
+        $scope.chartDataFerment.push({
           x: new Date(specificGravity[i][0] * 1000),
           y: specificGravity[i][1]
         });
       }
-      $scope.FG = $scope.chartData[0] ? $scope.chartData[$scope.chartData.length-1].y : 1100;
+      $scope.FG = $scope.chartDataFerment[0] ? $scope.chartDataFerment[$scope.chartDataFerment.length - 1].y : 1100;
     }
 
     getStatus(true); // true = set first-time
 
     $timeout(function() {
-      chart = new Chartist.Line('.ct-chart', {}, {
+      chartFerment = new Chartist.Line('.ct-chart-ferment', {}, {
         axisX: {
           type: Chartist.FixedScaleAxis,
           divisor: 5,
           labelInterpolationFnc: function(value) {
-            return moment(value).format('MMM D');
+            return moment(value).format('D-MMM');
           }
         }
       });
-      updateChart();
+      updateFermentChart();
+
+      chartRed = new Chartist.Line('.ct-chart-red', {}, {
+        axisX: {
+          type: Chartist.FixedScaleAxis,
+          divisor: 5,
+          labelInterpolationFnc: function(value) {
+            return moment(value).format('hh:mm');
+          }
+        }
+      });
+
+      chartGreen = new Chartist.Line('.ct-chart-green', {}, {
+        axisX: {
+          type: Chartist.FixedScaleAxis,
+          divisor: 5,
+          labelInterpolationFnc: function(value) {
+            return moment(value).format('hh:mm');
+          }
+        }
+      });
+
+      chartBlue = new Chartist.Line('.ct-chart-blue', {}, {
+        axisX: {
+          type: Chartist.FixedScaleAxis,
+          divisor: 5,
+          labelInterpolationFnc: function(value) {
+            return moment(value).format('hh:mm');
+          }
+        }
+      });
+
+      updateTempCharts();
     }, 1000);
   });

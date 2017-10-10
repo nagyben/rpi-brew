@@ -64,23 +64,24 @@
           <input class="text-center" type="checkbox" name="controlEnabled" />
         </div>
       </div>
-      <div class="col-10 px-2 d-flex align-items-center" ng-show="mode != 'ferment'">
-        <div class="col-12 row p-0">
-          <div class="col-4 text-center">
-            <h2>{{tRed | number : 1 || "n/a"}} &deg;C</h2>
-            <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
-            <h2 class="mt-2">{{prepElapsed}}</h2>
-          </div>
-          <div class="col-4 text-center">
-            <h2>{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
-            <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
-            <h2 class="mt-2">{{mashElapsed}}</h2>
-          </div>
-          <div class="col-4 text-center">
-            <h2>{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
-            <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
-            <h2 class="mt-2">{{boilElapsed}}</h2>
-          </div>
+      <div class="col-10 px-2 d-flex align-items-stretch" ng-show="mode != 'ferment'">
+        <div class="col-4 text-center d-flex flex-column justify-content-center">
+          <h2>{{tRed | number : 1 || "n/a"}} &deg;C</h2>
+          <button type="button" class="btn btn-danger btn-block mt-2" ng-click="startPrep()">PREP</button>
+          <h2 class="mt-2">{{prepElapsed}}</h2>
+          <div class="ct-chart-red" style="flex-grow:1"></div>
+        </div>
+        <div class="col-4 text-center d-flex flex-column justify-content-center">
+          <h2>{{tBlue | number : 1 || "n/a"}} &deg;C</h2>
+          <button type="button" class="btn btn-primary btn-block mt-2" ng-click="startMash()">MASH</button>
+          <h2 class="mt-2">{{mashElapsed}}</h2>
+          <div class="ct-chart-blue" style="flex-grow:1"></div>
+        </div>
+        <div class="col-4 text-center d-flex flex-column justify-content-center">
+          <h2>{{tGreen | number : 1 || "n/a"}} &deg;C</h2>
+          <button type="button" class="btn btn-success btn-block mt-2" ng-click="startBoil()">BOIL</button>
+          <h2 class="mt-2">{{boilElapsed}}</h2>
+          <div class="ct-chart-green" style="flex-grow:1"></div>
         </div>
       </div>
       <div class="col-10 p-0 d-flex" ng-show="mode == 'ferment'">
@@ -112,7 +113,7 @@
             <h2>{{ABV | number : 2}} % ABV</h2>
           </div>
           <div class="col-6">
-            <div class="ct-chart"></div>
+            <div class="ct-chart-ferment"></div>
           </div>
         </div>
       </div>
