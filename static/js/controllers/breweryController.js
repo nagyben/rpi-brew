@@ -119,6 +119,7 @@ angular.module('brewery')
                 });
               }
             }
+            updateTempCharts();
           },
           function error(data) {
             // try again
