@@ -98,7 +98,7 @@ angular.module('brewery')
             }
 
             tempIntervalCounter++;
-            
+
             if (tempIntervalCounter > 10) {
               tempIntervalCounter = 0;
               if (data.data.sensors[0].tempC) {
@@ -305,7 +305,8 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('D-MMM');
-          }
+          },
+          showPoint: false
         }
       });
       updateFermentChart();
@@ -316,7 +317,8 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          }
+          },
+          showPoint: false
         }
       });
 
@@ -326,7 +328,8 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          }
+          },
+          showPoint: false
         }
       });
 
@@ -336,7 +339,8 @@ angular.module('brewery')
           divisor: 5,
           labelInterpolationFnc: function(value) {
             return moment(value).format('hh:mm');
-          }
+          },
+          showPoint: false
         }
       });
 
