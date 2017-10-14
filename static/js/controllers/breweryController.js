@@ -307,11 +307,26 @@ angular.module('brewery')
             return moment(value).format('D-MMM');
           }
         },
+        axisY: {
+          low: 0,
+          high: 30,
+          onlyInteger: true,
+          offset: 30,
+          labelOffset: {
+            y: 6
+          }
+        },
+        chartPadding: {
+          top: 5,
+          right: 0,
+          bottom: 0,
+          left: 0
+        },
         showPoint: false
       });
       updateFermentChart();
 
-      chartRed = new Chartist.Line('.ct-chart-red', {}, {
+      var tempChartOptions = {
         axisX: {
           type: Chartist.FixedScaleAxis,
           divisor: 5,
@@ -319,30 +334,27 @@ angular.module('brewery')
             return moment(value).format('hh:mm');
           }
         },
+        axisY: {
+          low: 0,
+          high: 100,
+          onlyInteger: true,
+          offset: 30,
+          labelOffset: {
+            y: 6
+          }
+        },
+        chartPadding: {
+          top: 5,
+          right: 0,
+          bottom: 0,
+          left: 0
+        },
         showPoint: false
-      });
+      };
 
-      chartGreen = new Chartist.Line('.ct-chart-green', {}, {
-        axisX: {
-          type: Chartist.FixedScaleAxis,
-          divisor: 5,
-          labelInterpolationFnc: function(value) {
-            return moment(value).format('hh:mm');
-          }
-        },
-        showPoint: false
-      });
-
-      chartBlue = new Chartist.Line('.ct-chart-blue', {}, {
-        axisX: {
-          type: Chartist.FixedScaleAxis,
-          divisor: 5,
-          labelInterpolationFnc: function(value) {
-            return moment(value).format('hh:mm');
-          }
-        },
-        showPoint: false
-      });
+      chartRed = new Chartist.Line('.ct-chart-red', {}, tempChartOptions);
+      chartBlue = new Chartist.Line('.ct-chart-blue', {}, tempChartOptions);
+      chartGreen = new Chartist.Line('.ct-chart-green', {}, tempChartOptions);
 
       updateTempCharts();
     }, 1000);
