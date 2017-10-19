@@ -297,6 +297,7 @@ def update_settings():
     persist.settings['controlEnabled'] = controller.enabled
     persist.settings['mode'] = mode
     persist.settings['sg'] = specific_gravity
+    persist.settings['fermentStart'] = ferment_start_time
     persist.save(SETTINGS_FILE)
 
 
@@ -330,6 +331,10 @@ def load_settings():
     if 'sg' in persist.settings:
         global specific_gravity
         specific_gravity = persist.settings['sg']
+
+    if 'fermentStart' in persist.settings:
+        global ferment_start_time
+        ferment_start_time = persist.settings['fermentStart']
 
 
 def update_sensors():
