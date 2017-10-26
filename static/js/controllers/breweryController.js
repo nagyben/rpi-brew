@@ -121,7 +121,11 @@ angular.module('brewery')
                 });
               }
             }
-            updateTempCharts();
+            if ($scope.mode.toLowerCase() != "ferment") {
+              $timeout(updateTempCharts, 1000);
+            } else {
+              $timeout(updateFermentChart, 1000);
+            }
           },
           function error(data) {
             // try again
@@ -239,7 +243,7 @@ angular.module('brewery')
               x: new Date(),
               y: gravity
             });
-            updateChart();
+            updateFermentChart();
           }
         )
     }
@@ -308,8 +312,8 @@ angular.module('brewery')
           }
         },
         axisY: {
-          low: 0,
-          high: 30,
+          low: 1000,
+          high: 1100,
           onlyInteger: true,
           offset: 30,
           labelOffset: {
@@ -320,7 +324,7 @@ angular.module('brewery')
           top: 5,
           right: 0,
           bottom: 0,
-          left: 0
+          left: 6
         },
         showPoint: false
       });
