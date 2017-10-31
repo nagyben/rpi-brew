@@ -17,6 +17,7 @@ consolehandler.setFormatter(appformatter)
 log.addHandler(consolehandler)
 
 SETTINGS_FILE = 'persist.json'
+SENSOR_UPDATE_INTERVAL = 5
 
 # ------------------------------------------------------------------------- SETTINGS
 persist.load(SETTINGS_FILE)
@@ -39,6 +40,7 @@ ferment_start_time = None
 logging_enabled = False
 
 time_taken = 0
+last_sensor_update_time = 0
 
 specific_gravity = list()
 
@@ -338,8 +340,11 @@ def load_settings():
 
 
 def update_sensors():
-    for sensor in sensors:
-        sensor.update()
+    global last_sensor_update_time
+    if time.time() - last_sensor_update_time >= SENSOR_UPDATE_INTERVAL:
+        last_sensor_update_time = time.time()
+        for sensor in sensors:
+            sensor.update()
 
 
 def do_control():
@@ -374,7 +379,7 @@ def loop():
     time_taken = (time.time() - start_time) * 1000
 
     # Restart loop
-    t = Timer(5, loop)
+    t = Timer(1, loop)
     t.start()
 
 # ------------------------------------------------------------------------- START
