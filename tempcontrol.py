@@ -27,7 +27,7 @@ class TemperatureController:
     control_pin = 0
     enabled = False
 
-    heating = 0
+    heating = 0 # Whether the heater is on or not
 
     def __init__(self, control_pin, time_period):
         self.control_pin = control_pin
