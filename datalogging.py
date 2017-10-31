@@ -28,22 +28,20 @@ log.addHandler(consolehandler)
 log_counter = 0
 LOG_INTERVAL = 10
 
+last_log_time = 0
+
 def log_brew_data(*argv):
-    global log_counter
-    if log_counter >= LOG_INTERVAL:
-        log_counter = 0
+    global last_log_time
+    if time.time() - last_log_time >= LOG_INTERVAL:
+        last_log_time = time.time()
         message = ','.join(map(str, argv))
         if len(message) > 0:
             brewlogger.info(message)
-    else:
-        log_counter += 1
 
 def log_ferment_data(*argv):
-    global log_counter
-    if log_counter >= LOG_INTERVAL:
-        log_counter = 0
+    global last_log_time
+    if time.time() - last_log_time >= LOG_INTERVAL:
+        last_log_time = time.time()
         message = ','.join(map(str, argv))
         if len(message) > 0:
             fermentlogger.info(message)
-    else:
-        log_counter += 1
