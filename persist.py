@@ -6,7 +6,7 @@ settings = {}
 def save(file_path):
     global settings
     with open(file_path, 'w') as outfile:
-        json.dump(settings, outfile)
+        json.dump(settings, outfile, indent=2)
 
 
 def load(file_path):

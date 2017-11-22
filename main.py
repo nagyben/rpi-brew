@@ -364,7 +364,7 @@ def do_logging():
                 mode
             )
         else:
-            log_ferment_data(sensors[0].tempC, controller.heating)
+            log_ferment_data(sensors[0].tempC, sensors[1].tempC, controller.heating)
 
 
 def loop():
